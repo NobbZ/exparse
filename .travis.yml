@@ -2,10 +2,10 @@ language: elixir
 elixir:
   - 1.1.0
   - 1.2.0
-erlang_otp:
+otp_release:
   - 17.0
   - 18.0
 matrix:
   exclude:
     - elixir: 1.2.0
-      erlang_otp: 17.0
+      otp_release: 17.0
