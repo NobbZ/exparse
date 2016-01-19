@@ -1,0 +1,18 @@
+# Build artifacts
+/_build
+/deps
+*.ez
+
+# coverage and test reports
+/cover
+
+# generated documentation
+/doc
+
+# IDE stuff
+.idea
+*.iml
+
+# other stuff
+erl_crash.dump
+*~
