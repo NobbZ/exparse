@@ -5,6 +5,6 @@ elixir:
 otp_release:
   - 17.5
   - 18.2.1
-# script:
-#   - mix dialyzer --halt-exit-status
-#   - mix test
+script:
+  - mix dialyzer --halt-exit-status
+  - mix test
