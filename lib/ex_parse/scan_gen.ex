@@ -40,7 +40,7 @@ defmodule ExParse.ScanGen do
       @doc """
       Scans a given string and returns a `List` of `ExParse.Token`s.
       """
-      @spec scan_string(input :: String.t | List.t) :: [ExParse.Token.t]
+      @spec scan_string(input :: String.t | list) :: [ExParse.Token.t]
       def scan_string(input) when is_list(input), do: input |> to_string |> scan_string
       def scan_string(input) when is_binary(input) do
         IO.puts "I do know about the following rules: #{inspect @rules}."
@@ -50,7 +50,7 @@ defmodule ExParse.ScanGen do
       @doc """
       Opens a given file and scans it, returning a `List` of `ExParse.Token`s.
       """
-      @spec scan_file(file :: String.t | List.t) :: [ExParse.Token.t]
+      @spec scan_file(file :: String.t | list) :: :ok #[ExParse.Token.t]
       def scan_file(file) when is_list(file), do: file |> to_string |> scan_file
       def scan_file(file) when is_binary(file) do
         IO.puts "I do know about the following rules: #{inspect @rules}."
