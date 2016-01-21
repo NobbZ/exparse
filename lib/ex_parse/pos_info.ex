@@ -8,8 +8,13 @@ defmodule ExParse.PosInfo do
   def new(file, line, char) do
     cond do
       Range.range?(char) -> %__MODULE__{file: file, line: line, char: char}
-      is_integer(char) -> %__MODULE__{file: file, line: line, char: Range.new(char, char)}
+      is_integer(char) -> %__MODULE__{file: file, line: line,
+                                     char: Range.new(char, char)}
     end
+  end
+
+  def next_line(%__MODULE__{line: line} = pi) when line >= 0 do
+    %{pi | line: line + 1}
   end
 end
 
