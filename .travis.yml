@@ -5,6 +5,9 @@ elixir:
 otp_release:
   - 17.5
   - 18.2.1
+after_script:
+  - mix deps.get --only docs
+  - MIX_ENV=docs mix inch.report
 # before_script:
 #   - mix dialyzer.plt
 # script:

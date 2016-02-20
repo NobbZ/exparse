@@ -1,4 +1,4 @@
-# Exparse
+# Exparse [![Inline docs](http://inch-ci.org/github/NobbZ/exparse.svg)](http://inch-ci.org/github/NobbZ/exparse)
 
 **TODO: Add description**
 
