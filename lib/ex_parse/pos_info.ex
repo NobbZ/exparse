@@ -28,6 +28,10 @@ defmodule ExParse.PosInfo do
 
   @doc """
   Advances the position info to the beginning of the next line.
+
+  `pi` is the PosInfo you want to modify.
+
+  Returns the modified `PosInfo`.
   """
   def next_line(%__MODULE__{line: line} = pi) when line >= 0 do
     %{pi | line: line + 1, char: 0..0}
