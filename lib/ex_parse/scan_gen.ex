@@ -20,6 +20,7 @@ defmodule ExParse.ScanGen do
   * `scan_file/1` which does load a given file and tokenizes it
   """
   defmacro __using__(_) do
+    Process.put :num, 0
     quote do
       import ExParse.ScanGen
 
@@ -58,7 +59,7 @@ defmodule ExParse.ScanGen do
       end
     end
   end
-
+  
   @doc """
   Defines a tokenisation rule.
 
@@ -116,20 +117,31 @@ defmodule ExParse.ScanGen do
   defmacro defrule(state \\ :start, regex, do_block)
   defmacro defrule(state, regex, do: block) do
     binary_regex = "^#{Macro.unescape_string(regex, &Regex.unescape_map/1)}"
-    IO.inspect Regex.compile(binary_regex)
-    IO.inspect regex
-    rule_name = String.to_atom("rule_#{state}_#{regex}")
+    # IO.inspect Regex.compile(binary_regex)
+    # IO.inspect regex
+    sanitized_regex = sanitize_string regex
+    rule_name = String.to_atom("rule_#{Process.get :num}_#{state}_#{sanitized_regex}")
+    Process.put :num, Process.get(:num) + 1
     IO.puts "Found #{rule_name}"
+    
     quote do
       @rules Map.put(@rules, unquote(state), [{unquote(rule_name), unquote(regex)}|Map.get(@rules, unquote(state), [])])
       @rule_count @rule_count + 1
       defp unquote(rule_name)(var!(token), var!(old_state)) do
         _ = var!(old_state)
+        _ = var!(token)
         
         unquote(block)
       end
     end
   end
+
+  defp sanitize_string(string, acc \\ [], res \\ [])
+  defp sanitize_string(<<h::utf8, t::binary>>, acc, res) when h in 0x20..0x7e, do: sanitize_string t, [h|acc], res
+  defp sanitize_string(<<_::utf8, t::binary>>, acc, res), do: sanitize_string t, [?_|acc], res
+  defp sanitize_string("", [?_, ?_|t], res), do: sanitize_string "", [?_|t], res
+  defp sanitize_string("", [h|t], res), do: sanitize_string "", t, [h|res]
+  defp sanitize_string("", [], res), do: res |> to_string
 end
 
 defmodule FooBar do
@@ -140,4 +152,6 @@ defmodule FooBar do
   use ExParse.ScanGen
 
   defrule "fo\no", do: %{token | token: :foo}
+  defrule "fo\n\nodo", do: %{token | token: :foodo}
+  defrule "asd", do: :skip
 end
