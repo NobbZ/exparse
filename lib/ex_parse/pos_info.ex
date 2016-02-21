@@ -9,6 +9,12 @@ defmodule ExParse.PosInfo do
                            line: non_neg_integer,
                            char: Range.t(non_neg_integer, non_neg_integer)}
 
+  @doc """
+  Creates a new `PosInfo`.
+
+  `file` is the name of the file the `PosInfo` is for, `line` the line the info
+  is for and `char` specifies starting and ending character on that line.
+  """
   def new(file \\ "", line \\ 0, char \\ 0..0)
   def new(file, line, char) do
     cond do
