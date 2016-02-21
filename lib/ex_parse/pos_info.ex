@@ -1,4 +1,9 @@
 defmodule ExParse.PosInfo do
+  @moduledoc """
+  Provides some datatype and functions over it that let you determine position
+  in a file.
+  """
+
   defstruct file: "", line: 0, char: 0..0
   @opaque t :: %__MODULE__{file: String.t,
                            line: non_neg_integer,
@@ -13,6 +18,9 @@ defmodule ExParse.PosInfo do
     end
   end
 
+  @doc """
+  Advances the position info to the beginning of the next line.
+  """
   def next_line(%__MODULE__{line: line} = pi) when line >= 0 do
     %{pi | line: line + 1}
   end

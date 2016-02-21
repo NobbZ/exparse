@@ -1,5 +1,6 @@
 defmodule ExParse.Nfa do
-
+  @moduledoc "A non-deterministic finite automaton."
+  
   defstruct states: Map.new, symbols: MapSet.new, delta: Map.new, start: nil, finals: MapSet.new
   @opaque t :: %__MODULE__{states:  Dict.t,
                            symbols: Set.t,

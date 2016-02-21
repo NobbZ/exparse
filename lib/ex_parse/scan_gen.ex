@@ -133,6 +133,10 @@ defmodule ExParse.ScanGen do
 end
 
 defmodule FooBar do
+  @moduledoc """
+  This is an undocumented dummy and will be removed in the future.
+  """
+
   use ExParse.ScanGen
 
   defrule "fo\no", do: %{token | token: :foo}
