@@ -37,9 +37,9 @@ defmodule ExParse.RegexParseTest do
     end
   end
 
-  property :"full string uinions" do
+  property :"full string unions" do
     for_all {s1, s2} in {unicode_string, unicode_string} do
-      implies s1 !== [] && s2 !== [] && not Enum.any?(@chars_to_escape, &Enum.member?(s1, &1)) && not Enum.any?(&Enum.member?(s2, &1)) do
+      implies s1 !== [] && s2 !== [] && not Enum.any?(@chars_to_escape, &Enum.member?(s1, &1)) && not Enum.any?(@chars_to_escape, &Enum.member?(s2, &1)) do
         {:ok, reTree} = RP.parse(s1 ++ '|' ++ s2)
         assert match?([{:union, [^s1], [^s2]}], reTree)
       end
