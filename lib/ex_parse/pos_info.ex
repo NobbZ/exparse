@@ -23,7 +23,7 @@ defmodule ExParse.PosInfo do
   Advances the position info to the beginning of the next line.
   """
   def next_line(%__MODULE__{line: line} = pi) when line >= 0 do
-    %{pi | line: line + 1}
+    %{pi | line: line + 1, char: 0..0}
   end
 end
 

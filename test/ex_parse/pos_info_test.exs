@@ -6,10 +6,11 @@ defmodule ExParse.PosInfoTest do
   alias ExParse.PosInfo, as: PI
 
   property :next_line do
-    for_all line in non_neg_integer do
-      posinfo1 = %PI{line: line}
+    for_all {line, a, b} in {non_neg_integer, non_neg_integer, non_neg_integer} do
+      [small, big] = Enum.sort [a, b]
+      posinfo1 = %PI{line: line, char: small..big}
       posinfo2 = PI.next_line(posinfo1)
-      posinfo2.line === line + 1
+      posinfo2.line === line + 1 && posinfo2.char === 0..0
     end
   end
   
