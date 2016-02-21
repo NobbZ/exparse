@@ -21,19 +21,3 @@ defmodule ExParse.Nfa do
     nfa = %{nfa | states: states, start: start, finals: finals}
   end
 end
-
-defmodule ExParse.Nfa.RegexScanner do
-  def scan(string), do: scan(string, [])
-  
-  defp scan(<<>>, tokens), do: Enum.reverse tokens
-  defp scan("|" <> string, tokens), do: scan <<string>>, [:pipe|tokens]
-  defp scan(<<c, string>>, tokens) when c === ?*, do: scan <<string>>, [:star|tokens]
-  defp scan(<<c, string>>, tokens) when c === ?+, do: scan <<string>>, [:plus|tokens]
-  defp scan(<<c, string>>, tokens) when c === ?(, do: scan <<string>>, [:oppa|tokens]
-  defp scan(<<c, string>>, tokens) when c === ?), do: scan <<string>>, [:clpa|tokens]
-  defp scan(<<c, string>>, tokens) when c === ?., do: scan <<string>>, [:any |tokens]
-  defp scan(<<c, string>>, tokens) when c === ?$, do: scan <<string>>, [:eos |tokens]
-  defp scan(<<c, string>>, tokens) when c === ?[, do: scan <<string>>, [:opbr|tokens]
-  defp scan(<<c, string>>, tokens) when c === ?], do: scan <<string>>, [:clbr|tokens]
-  defp scan(<<c, string>>, tokens), do: [{:char, c}|tokens]
-end
