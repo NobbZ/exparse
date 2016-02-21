@@ -13,8 +13,9 @@ defmodule ExParse.PosInfo do
   def new(file, line, char) do
     cond do
       Range.range?(char) -> %__MODULE__{file: file, line: line, char: char}
-      is_integer(char) -> %__MODULE__{file: file, line: line,
-                                     char: Range.new(char, char)}
+      is_integer(char)   -> %__MODULE__{file: file, line: line,
+                                        char: Range.new(char, char)}
+      true               -> raise ArgumentError, message: "Expected Argument to be either a range or an integer, but got -> #{inspect char} <-"
     end
   end
 
