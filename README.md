@@ -1,4 +1,4 @@
-# Exparse [![Inline docs](http://inch-ci.org/github/NobbZ/exparse.svg)](http://inch-ci.org/github/NobbZ/exparse)
+# Exparse [![Inline docs](http://inch-ci.org/github/NobbZ/exparse.svg)](http://inch-ci.org/github/NobbZ/exparse) [![Deps Status](https://beta.hexfaktor.org/badge/all/github/NobbZ/exparse.svg)](https://beta.hexfaktor.org/github/NobbZ/exparse)
 
 **TODO: Add description**
 
