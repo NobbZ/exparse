@@ -35,6 +35,6 @@ defmodule ExParse.Mixfile do
      {:triq, github: "krestenkrab/triq", only: :test},
 
      {:inch_ex,  "~> 0.5.1", only: :dev},
-     {:credo,    "~> 0.3.3", only: :dev}]
+     {:credo,    "~> 0.4.1", only: :dev}]
   end
 end
