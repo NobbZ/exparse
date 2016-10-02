@@ -1,65 +1,136 @@
 defmodule ExParse.RegexParseTest do
   use ExUnit.Case, async: true
-  use ExCheck
+  # use ExCheck
   doctest ExParse.RegexParse
 
   alias ExParse.RegexParse, as: RP
 
-  @chars_to_escape '$|*+^-?()[]\\.'
+  describe "concat" do
+    test "",   do: assert {:ok, :epsilon} = RP.parse("")
+    test "a",  do: assert {:ok, ~c[a]}    = RP.parse("a")
+    test "ab", do: assert {:ok, ~c[ab]}   = RP.parse("ab")
+  end
 
-  property :"single char string" do
-    for_all c in char do
-      {:ok, reTree} = RP.parse(<<c::utf8>>)
-      [[c]] === reTree
+  describe "union" do
+    test "|a",   do: assert {:ok, {:union, :epsilon, ~c[a]}} = RP.parse("|a")
+    test "a|",   do: assert {:ok, {:union, ~c[a], :epsilon}} = RP.parse("a|")
+    test "a|b",  do: assert {:ok, {:union, ~c[a],  ~c[b]}}   = RP.parse("a|b")
+    test "ab|c", do: assert {:ok, {:union, ~c[ab], ~c[c]}}   = RP.parse("ab|c")
+    test "a|bc", do: assert {:ok, {:union, ~c[a], ~c[bc]}}   = RP.parse("a|bc")
+  end
+
+  describe "repeat zero or more" do
+    test "a*",   do: assert {:ok,  {:zero_more, ~c[a]}         } = RP.parse("a*")
+    test "a*b",  do: assert {:ok, [{:zero_more, ~c[a]}, ?b]    } = RP.parse("a*b")
+    test "a*bc", do: assert {:ok, [{:zero_more, ~c[a]}, ?b, ?c]} = RP.parse("a*bc")
+    test "ab*c", do: assert {:ok, [?a, {:zero_more, ~c[b]}, ?c]} = RP.parse("ab*c")
+    test "abc*", do: assert {:ok, [?a, ?b, {:zero_more, ~c[c]}]} = RP.parse("abc*")
+  end
+
+  describe "repeat one ore more" do
+    test "a+",   do: assert {:ok,  {:one_more, ~c[a]}         } = RP.parse("a+")
+    test "a+b",  do: assert {:ok, [{:one_more, ~c[a]}, ?b]    } = RP.parse("a+b")
+    test "a+bc", do: assert {:ok, [{:one_more, ~c[a]}, ?b, ?c]} = RP.parse("a+bc")
+    test "ab+c", do: assert {:ok, [?a, {:one_more, ~c[b]}, ?c]} = RP.parse("ab+c")
+    test "abc+", do: assert {:ok, [?a, ?b, {:one_more, ~c[c]}]} = RP.parse("abc+")
+  end
+
+  describe "option" do
+    test "a?",   do: assert {:ok,  {:zero_one, ~c[a]}         } = RP.parse("a?")
+    test "a?b",  do: assert {:ok, [{:zero_one, ~c[a]}, ?b]    } = RP.parse("a?b")
+    test "a?bc", do: assert {:ok, [{:zero_one, ~c[a]}, ?b, ?c]} = RP.parse("a?bc")
+    test "ab?c", do: assert {:ok, [?a, {:zero_one, ~c[b]}, ?c]} = RP.parse("ab?c")
+    test "abc?", do: assert {:ok, [?a, ?b, {:zero_one, ~c[c]}]} = RP.parse("abc?")
+  end
+
+  describe "groups" do
+    test "(a)",  do: assert {:ok,  {:group, ~c[a]}     } = RP.parse("(a)")
+    test "(ab)", do: assert {:ok,  {:group, ~c[ab]}    } = RP.parse("(ab)")
+    test "(a)b", do: assert {:ok, [{:group, ~c[a]}, ?b]} = RP.parse("(a)b")
+    test "a(b)", do: assert {:ok, [?a, {:group, ~c[b]}]} = RP.parse("a(b)")
+  end
+
+  describe "charsets" do
+    test "[a]",   do: assert {:ok,  {:set, ~c[a]}     } = RP.parse("[a]")
+    test "[ab]",  do: assert {:ok,  {:set, ~c[ab]}    } = RP.parse("[ab]")
+    test "[a]b",  do: assert {:ok, [{:set, ~c[a]}, ?b]} = RP.parse("[a]b")
+    test "a[b]",  do: assert {:ok, [?a, {:set, ~c[b]}]} = RP.parse("a[b]")
+    test "[abc]", do: assert {:ok,  {:set, ~c[abc]}   } = RP.parse("[abc]")
+    test "[a-c]", do: assert {:ok,  {:set, ~c[abc]}   } = RP.parse("[a-c]")
+  end
+
+  describe "negated charsets" do
+    test "[^a]",  do: assert {:ok,  {:neg_set, ~c[a]}     } = RP.parse("[^a]")
+    test "[^ab]", do: assert {:ok,  {:neg_set, ~c[ab]}    } = RP.parse("[^ab]")
+    test "[^a]b", do: assert {:ok, [{:neg_set, ~c[a]}, ?b]} = RP.parse("[^a]b")
+    test "a[^b]", do: assert {:ok, [?a, {:neg_set, ~c[b]}]} = RP.parse("a[^b]")
+  end
+
+  describe "specials" do
+    test ".",  do: assert {:ok, :any}       = RP.parse(".")
+    test "a.", do: assert {:ok, [?a, :any]} = RP.parse("a.")
+    test ".a", do: assert {:ok, [:any, ?a]} = RP.parse(".a")
+
+    test "^", do: assert {:ok, :bos} = RP.parse("^")
+    test "$", do: assert {:ok, :eos} = RP.parse("$")
+
+    test "\\d", do: assert {:ok, :digit}    = RP.parse("\\d")
+    test "\\D", do: assert {:ok, :no_digit} = RP.parse("\\D")
+
+    test "\\s", do: assert {:ok, :whitespace}    = RP.parse("\\s")
+    test "\\S", do: assert {:ok, :no_whitespace} = RP.parse("\\S")
+
+    test "\\w", do: assert {:ok, :word_character}    = RP.parse("\\w")
+    test "\\W", do: assert {:ok, :no_word_character} = RP.parse("\\W")
+  end
+
+  describe "combinations" do
+    test "a?b*", do: assert {:ok, [{:zero_one, ~c[a]}, {:zero_more, ~c[b]}]} = RP.parse("a?b*")
+  end
+
+  describe "simplify" do
+    test "option" do
+      {:ok, re_ast} = RP.parse "a?"
+     assert {:union, :epsilon, ~c[a]} = RP.simplify(re_ast)
+    end
+
+    test "one or more" do
+      {:ok, re_ast} = RP.parse "a+"
+     assert [?a, {:zero_more, ~c[a]}] = RP.simplify(re_ast)
+    end
+
+    test "one or more of charset" do
+      {:ok, re_ast} = RP.parse "[abc]+"
+      assert [{:set, ~c[abc]}, {:zero_more, {:set, ~c[abc]}}] = RP.simplify(re_ast)
     end
   end
 
-  property :double_char_string do
-    for_all {c1, c2} in {char, char} do
-      {:ok, reTree} = RP.parse(<<c1::utf8, c2::utf8>>)
-      [[c1, c2]] === reTree
-    end
-  end
-
-  property :full_string do
-    for_all s in unicode_string do
-      implies s !== [] && not Enum.any?(@chars_to_escape, &Enum.member?(s, &1)) do
-        {:ok, reTree} = RP.parse(s)
-        [to_char_list(s)] === reTree
-      end
-    end
-  end
-
-  property :"single char unions" do
-    for_all {c1, c2} in {char, char} do
-      {:ok, reTree} = RP.parse(<<c1::utf8, ?|::utf8, c2::utf8>>)
-      assert match?([{:union, [[^c1]], [[^c2]]}], reTree)
-    end
-  end
-
-  property :"full string unions" do
-    for_all {s1, s2} in {unicode_string, unicode_string} do
-      implies s1 !== [] && s2 !== [] && not Enum.any?(@chars_to_escape, &Enum.member?(s1, &1)) && not Enum.any?(@chars_to_escape, &Enum.member?(s2, &1)) do
-        {:ok, reTree} = RP.parse(s1 ++ '|' ++ s2)
-        assert match?([{:union, [^s1], [^s2]}], reTree)
-      end
-    end
-  end
-      
-
-  property :single_char_group do
-    for_all c in char do
-      {:ok, reTree} = RP.parse('(' ++ [c] ++ ')')
-      [{:group, [[c]]}] === reTree
-    end
-  end
-
-  property :long_group do
-    for_all s in unicode_string do
-      implies s !== [] && not Enum.any?(@chars_to_escape, &Enum.member?(s, &1)) do
-        {:ok, reTree} = RP.parse('(' ++ s ++ ')')
-        [group: [s]] === reTree
-      end
-    end
+  test "complex case" do
+    assert \
+      {:ok, [{:group,
+              {:union,
+               {:union, [?2, ?5, {:set, '012345'}],
+                [?2, {:set, '01234'}, {:set, '0123456789'}]},
+               [zero_one: {:set, '01'}, set: '0123456789',
+                zero_one: {:set, '0123456789'}]}}, :any,
+             {:group,
+              {:union,
+               {:union, [?2, ?5, {:set, '012345'}],
+                [?2, {:set, '01234'}, {:set, '0123456789'}]},
+               [zero_one: {:set, '01'}, set: '0123456789',
+                zero_one: {:set, '0123456789'}]}}, :any,
+             {:group,
+              {:union,
+               {:union, [?2, ?5, {:set, '012345'}],
+                [?2, {:set, '01234'}, {:set, '0123456789'}]},
+               [zero_one: {:set, '01'}, set: '0123456789',
+                zero_one: {:set, '0123456789'}]}}, :any,
+             {:group,
+              {:union,
+               {:union, [?2, ?5, {:set, '012345'}],
+                [?2, {:set, '01234'}, {:set, '0123456789'}]},
+               [zero_one: {:set, '01'}, set: '0123456789',
+                zero_one: {:set, '0123456789'}]}}]} \
+      = RP.parse("(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)")
   end
 end
