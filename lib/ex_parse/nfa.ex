@@ -1,30 +1,53 @@
 defmodule ExParse.Nfa do
   @moduledoc "A non-deterministic finite automaton."
-  
-  defstruct states: Map.new, symbols: MapSet.new, delta: Map.new, start: nil, finals: MapSet.new
-  @opaque t :: %__MODULE__{states:  Dict.t,
-                           symbols: Set.t,
-                           delta:   (state, symbol -> state),
-                           start:   state | nil,
-                           finals:  Set.t}
 
-  @type symbol :: char
-  @type state  :: integer
+  defstruct states: Map.new
 
   @all_chars 0..0xd7ff |> Enum.into(MapSet.new)
 
-  @doc """
-  Creates a new non-deterministic finite automaton.
+  def new(), do: %__MODULE__{states: %{
+    0 => %{epsilon: [2]},
+    2 => %{epsilon: [3]},
+    3 => %{epsilon: [1]},
+    1 => %{},
+  }}
 
-  `string` takes an elixir string or an charlist, while `tok_fun` is the
-  function that shall be called on acceptance of the input.
-  """
-  def new(string, tok_fun) when is_binary(string), do: string |> to_char_list |> new(tok_fun)
-  def new(string, tok_fun) when is_list(string) do
-    nfa = %__MODULE__{}
-    states = [{0, nil}, {1, tok_fun}] |> Enum.into(Map.new)
-    start = 0
-    finals = [1] |> Enum.into(MapSet.new)
-    nfa = %{nfa | states: states, start: start, finals: finals}
+  def from_regex(re) do
+    case from_regex(re, new, 2, 3, 4) do
+      {x, nfa} when is_integer(x) -> {:ok, nfa}
+      res -> res
+    end
   end
+
+  defp from_regex(re, %__MODULE__{} = nfa, from, to, next) do
+    case re do
+      x when x in [:epsilon, []] ->
+        if to in nfa.states[from][:epsilon] do
+          {next, nfa}
+        else
+          prev_goals = nfa.states[from][:epsilon] || []
+
+          new_states = IO.inspect %{
+            from => Map.merge(nfa.states[from], Enum.sort([to|prev_goals]))
+          }
+        end
+      [c|cs]   ->
+        new_states = %{
+          from     => %{epsilon: [next]},
+          next     => %{c     => [next + 1]},
+          next + 1 => %{epsilon: [to]}
+        }
+        nfa = %{nfa | states: Map.merge(nfa.states, new_states)}
+        from_regex(cs, nfa, next + 1, to, next + 2)
+      {:union, left, right} ->
+        {next, nfa} = from_regex(left, nfa, from, to, next)
+        from_regex(right, nfa, from, to, next)
+    end
+  end
+
+  defp connect(nfa, from, to, label)
+  defp connect(%__MODULE__{} = nfa, from, to, label) do
+
+  end
+#  defp connection(%__MODULE__{} = nfa, from, to)
 end

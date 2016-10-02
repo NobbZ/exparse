@@ -14,3 +14,10 @@ mix.lock
 # other stuff
 erl_crash.dump
 *~
+
+# TEX-temporyry
+/tex/*.aux
+/tex/*.log
+/tex/*.pdf
+/tex/*.synctex.gz
+/tex/*.toc
