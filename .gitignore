@@ -2,6 +2,7 @@
 /_build
 /deps
 *.ez
+mix.lock
 
 # coverage and test reports
 /cover
@@ -9,10 +10,6 @@
 # generated documentation
 /doc
 /docs
-
-# IDE stuff
-.idea
-*.iml
 
 # other stuff
 erl_crash.dump
