@@ -27,7 +27,7 @@ defmodule ExParse.Nfa do
         else
           prev_goals = nfa.states[from][:epsilon] || []
 
-          new_states = IO.inspect %{
+          new_states = %{
             from => Map.merge(nfa.states[from], Enum.sort([to|prev_goals]))
           }
         end
@@ -47,7 +47,6 @@ defmodule ExParse.Nfa do
 
   defp connect(nfa, from, to, label)
   defp connect(%__MODULE__{} = nfa, from, to, label) do
-
+    # TODO: implement
   end
-#  defp connection(%__MODULE__{} = nfa, from, to)
 end
