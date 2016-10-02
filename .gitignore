@@ -1,6 +1,8 @@
 # Build artifacts
 /_build
 /deps
+/src/regex_parse.erl
+/src/regex_scan.erl
 *.ez
 mix.lock
 
