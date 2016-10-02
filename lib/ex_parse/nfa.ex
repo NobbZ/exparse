@@ -7,7 +7,7 @@ defmodule ExParse.Nfa do
 
   def new(), do: %__MODULE__{states: %{
     0 => %{epsilon: [2]},
-    2 => %{epsilon: [3]},
+    2 => %{},
     3 => %{epsilon: [1]},
     1 => %{},
   }}
@@ -21,32 +21,36 @@ defmodule ExParse.Nfa do
 
   defp from_regex(re, %__MODULE__{} = nfa, from, to, next) do
     case re do
-      x when x in [:epsilon, []] ->
-        if to in nfa.states[from][:epsilon] do
-          {next, nfa}
-        else
-          prev_goals = nfa.states[from][:epsilon] || []
-
-          new_states = %{
-            from => Map.merge(nfa.states[from], Enum.sort([to|prev_goals]))
-          }
-        end
-      [c|cs]   ->
-        new_states = %{
-          from     => %{epsilon: [next]},
-          next     => %{c     => [next + 1]},
-          next + 1 => %{epsilon: [to]}
-        }
-        nfa = %{nfa | states: Map.merge(nfa.states, new_states)}
-        from_regex(cs, nfa, next + 1, to, next + 2)
+      [] -> from_regex(:epsilon, nfa, from, to, next)
+      :epsilon ->
+        connect(nfa, from, to, :epsilon, next)
+      char when is_integer(char) ->
+        connect(nfa, from, to, <<char::utf8>>, next)
+      seq when is_list(seq) ->
+        from_regex(hd(seq), nfa, from, to, next)
+#        new_states = %{
+#          from     => %{c     => [to]},
+#        }
+#        nfa = %{nfa | states: Map.merge(nfa.states, new_states)}
+#        from_regex(cs, nfa, next + 1, to, next + 2)
       {:union, left, right} ->
-        {next, nfa} = from_regex(left, nfa, from, to, next)
-        from_regex(right, nfa, from, to, next)
+#        {next, nfa} = from_regex(left, nfa, from, to, next)
+#        from_regex(right, nfa, from, to, next)
     end
   end
 
-  defp connect(nfa, from, to, label)
-  defp connect(%__MODULE__{} = nfa, from, to, label) do
-    # TODO: implement
+  defp connect(nfa, from, to, label, next)
+  defp connect(%__MODULE__{} = nfa, from, to, label, next) do
+    if to in (nfa.states[from][label] || []) do
+      {next, nfa}
+    else
+      target_states = nfa.states[from][label] || []
+
+      new_state_transitions = %{
+        from => Map.merge(nfa.states[from], %{label => Enum.sort([to|target_states])})
+      }
+
+      {next, %{nfa | states: Map.merge(nfa.states, new_state_transitions)}}
+    end
   end
 end

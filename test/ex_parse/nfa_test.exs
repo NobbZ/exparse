@@ -9,33 +9,27 @@ defmodule ExParse.NfaTest do
   describe "concat" do
     test "" do
       assert {:ok, %Nfa{states: %{
-        0 => %{epsilon: [2]},
-        2 => %{epsilon: [3]},
-        3 => %{epsilon: [1]},
+        0 => %{:epsilon => [2]},
+        2 => %{:epsilon => [3]},
+        3 => %{:epsilon => [1]},
         1 => %{}
-      }}} === ""   |> RP.parse! |> Nfa.from_regex
+      }}} === "" |> RP.parse! |> Nfa.from_regex
     end
 
     test "a" do
       assert {:ok, %Nfa{states: %{
-        0 => %{epsilon: [2]},
-        2 => %{epsilon: [4]},
-        4 => %{?a    => [5]},
-        5 => %{epsilon: [3]},
-        3 => %{epsilon: [1]},
+        0 => %{:epsilon => [2]},
+        2 => %{"a"      => [3]},
+        3 => %{:epsilon => [1]},
         1 => %{}
       }}} === "a"  |> RP.parse! |> Nfa.from_regex
     end
 
     test "ab" do
       assert {:ok, %Nfa{states: %{
-        0 => %{epsilon: [2]},
-        2 => %{epsilon: [4]},
-        4 => %{?a    => [5]},
-        5 => %{epsilon: [6]},
-        6 => %{?b    => [7]},
-        7 => %{epsilon: [3]},
-        3 => %{epsilon: [1]},
+        0 => %{:epsilon => [2]},
+        2 => %{"a"      => [4]},
+        4 => %{"b"      => [1]},
         1 => %{}
       }}} === "ab" |> RP.parse! |> Nfa.from_regex
     end
@@ -44,15 +38,23 @@ defmodule ExParse.NfaTest do
   describe "union" do
     test "|a" do
       assert {:ok, %Nfa{states: %{
-        0 => %{epsilon: [2]},
-        2 => %{epsilon: [3, 4]},
-        3 => %{epsilon: [1]},
-        4 => %{?a    => [5]},
-        5 => %{epsilon: [3]},
+        0 => %{:epsilon => [2]},
+        2 => %{:epsilon => [3],
+               "a"      => [3]},
+        3 => %{:epsilon => [1]},
         1 => %{}
-      }}} = "|a" |> RP.parse! |> Nfa.from_regex
+      }}} === "|a" |> RP.parse! |> Nfa.from_regex
     end
-#    test "a|",   do: assert {:ok, {:union, ~c[a], :epsilon}} = RP.parse("a|")
+
+    test "a|" do
+      assert {:ok, %Nfa{states: %{
+        0 => %{:epsilon => [2]},
+        2 => %{:epsilon => [3],
+               "a"      => [3]},
+        3 => %{:epsilon => [1]},
+        1 => %{}
+      }}} === "a|" |> RP.parse! |> Nfa.from_regex
+    end
 #    test "a|b",  do: assert {:ok, {:union, ~c[a],  ~c[b]}}   = RP.parse("a|b")
 #    test "ab|c", do: assert {:ok, {:union, ~c[ab], ~c[c]}}   = RP.parse("ab|c")
 #    test "a|bc", do: assert {:ok, {:union, ~c[a], ~c[bc]}}   = RP.parse("a|bc")
