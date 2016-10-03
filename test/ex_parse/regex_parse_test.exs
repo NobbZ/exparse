@@ -5,10 +5,20 @@ defmodule ExParse.RegexParseTest do
 
   alias ExParse.RegexParse, as: RP
 
-  describe "concat" do
-    test "",   do: assert {:ok, :epsilon} = RP.parse("")
-    test "a",  do: assert {:ok, ~c[a]}    = RP.parse("a")
-    test "ab", do: assert {:ok, ~c[ab]}   = RP.parse("ab")
+  @example_table %{
+    "concat" => [
+      {"", {:ok, :epsilon}},
+      {"a", {:ok, ~c[a]}},
+      {"ab", {:ok, ~c[ab]}},
+    ]
+  }
+
+  for {description, examples} <- @example_table do
+    describe description do
+      for {input, expect} <- examples do
+        test "~r/#{input}/", do: assert unquote(expect) = RP.parse(unquote(input))
+      end
+    end
   end
 
   describe "union" do
