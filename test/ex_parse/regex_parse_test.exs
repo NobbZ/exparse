@@ -20,48 +20,48 @@ defmodule ExParse.RegexParseTest do
   end
 
   describe "repeat zero or more" do
-    test "a*",   do: assert {:ok,  {:zero_more, ~c[a]}         } = RP.parse("a*")
-    test "a*b",  do: assert {:ok, [{:zero_more, ~c[a]}, ?b]    } = RP.parse("a*b")
+    test "a*",   do: assert {:ok, {:zero_more, ~c[a]}}           = RP.parse("a*")
+    test "a*b",  do: assert {:ok, [{:zero_more, ~c[a]}, ?b]}     = RP.parse("a*b")
     test "a*bc", do: assert {:ok, [{:zero_more, ~c[a]}, ?b, ?c]} = RP.parse("a*bc")
     test "ab*c", do: assert {:ok, [?a, {:zero_more, ~c[b]}, ?c]} = RP.parse("ab*c")
     test "abc*", do: assert {:ok, [?a, ?b, {:zero_more, ~c[c]}]} = RP.parse("abc*")
   end
 
   describe "repeat one ore more" do
-    test "a+",   do: assert {:ok,  {:one_more, ~c[a]}         } = RP.parse("a+")
-    test "a+b",  do: assert {:ok, [{:one_more, ~c[a]}, ?b]    } = RP.parse("a+b")
+    test "a+",   do: assert {:ok, {:one_more, ~c[a]}}           = RP.parse("a+")
+    test "a+b",  do: assert {:ok, [{:one_more, ~c[a]}, ?b]}     = RP.parse("a+b")
     test "a+bc", do: assert {:ok, [{:one_more, ~c[a]}, ?b, ?c]} = RP.parse("a+bc")
     test "ab+c", do: assert {:ok, [?a, {:one_more, ~c[b]}, ?c]} = RP.parse("ab+c")
     test "abc+", do: assert {:ok, [?a, ?b, {:one_more, ~c[c]}]} = RP.parse("abc+")
   end
 
   describe "option" do
-    test "a?",   do: assert {:ok,  {:zero_one, ~c[a]}         } = RP.parse("a?")
-    test "a?b",  do: assert {:ok, [{:zero_one, ~c[a]}, ?b]    } = RP.parse("a?b")
+    test "a?",   do: assert {:ok, {:zero_one, ~c[a]}}           = RP.parse("a?")
+    test "a?b",  do: assert {:ok, [{:zero_one, ~c[a]}, ?b]}     = RP.parse("a?b")
     test "a?bc", do: assert {:ok, [{:zero_one, ~c[a]}, ?b, ?c]} = RP.parse("a?bc")
     test "ab?c", do: assert {:ok, [?a, {:zero_one, ~c[b]}, ?c]} = RP.parse("ab?c")
     test "abc?", do: assert {:ok, [?a, ?b, {:zero_one, ~c[c]}]} = RP.parse("abc?")
   end
 
   describe "groups" do
-    test "(a)",  do: assert {:ok,  {:group, ~c[a]}     } = RP.parse("(a)")
-    test "(ab)", do: assert {:ok,  {:group, ~c[ab]}    } = RP.parse("(ab)")
+    test "(a)",  do: assert {:ok, {:group, ~c[a]}}       = RP.parse("(a)")
+    test "(ab)", do: assert {:ok, {:group, ~c[ab]}}      = RP.parse("(ab)")
     test "(a)b", do: assert {:ok, [{:group, ~c[a]}, ?b]} = RP.parse("(a)b")
     test "a(b)", do: assert {:ok, [?a, {:group, ~c[b]}]} = RP.parse("a(b)")
   end
 
   describe "charsets" do
-    test "[a]",   do: assert {:ok,  {:set, ~c[a]}     } = RP.parse("[a]")
-    test "[ab]",  do: assert {:ok,  {:set, ~c[ab]}    } = RP.parse("[ab]")
+    test "[a]",   do: assert {:ok, {:set, ~c[a]}}       = RP.parse("[a]")
+    test "[ab]",  do: assert {:ok, {:set, ~c[ab]}}      = RP.parse("[ab]")
     test "[a]b",  do: assert {:ok, [{:set, ~c[a]}, ?b]} = RP.parse("[a]b")
     test "a[b]",  do: assert {:ok, [?a, {:set, ~c[b]}]} = RP.parse("a[b]")
-    test "[abc]", do: assert {:ok,  {:set, ~c[abc]}   } = RP.parse("[abc]")
-    test "[a-c]", do: assert {:ok,  {:set, ~c[abc]}   } = RP.parse("[a-c]")
+    test "[abc]", do: assert {:ok, {:set, ~c[abc]}}     = RP.parse("[abc]")
+    test "[a-c]", do: assert {:ok, {:set, ~c[abc]}}     = RP.parse("[a-c]")
   end
 
   describe "negated charsets" do
-    test "[^a]",  do: assert {:ok,  {:neg_set, ~c[a]}     } = RP.parse("[^a]")
-    test "[^ab]", do: assert {:ok,  {:neg_set, ~c[ab]}    } = RP.parse("[^ab]")
+    test "[^a]",  do: assert {:ok, {:neg_set, ~c[a]}}       = RP.parse("[^a]")
+    test "[^ab]", do: assert {:ok, {:neg_set, ~c[ab]}}      = RP.parse("[^ab]")
     test "[^a]b", do: assert {:ok, [{:neg_set, ~c[a]}, ?b]} = RP.parse("[^a]b")
     test "a[^b]", do: assert {:ok, [?a, {:neg_set, ~c[b]}]} = RP.parse("a[^b]")
   end
@@ -131,6 +131,11 @@ defmodule ExParse.RegexParseTest do
                 [?2, {:set, '01234'}, {:set, '0123456789'}]},
                [zero_one: {:set, '01'}, set: '0123456789',
                 zero_one: {:set, '0123456789'}]}}]} \
-      = RP.parse("(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)")
+      = RP.parse(
+        "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\." <>
+        "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\." <>
+        "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\." <>
+        "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"
+      )
   end
 end
