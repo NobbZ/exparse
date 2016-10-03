@@ -10,5 +10,5 @@ after_script:
 before_script:
   - mix dialyzer.plt
 script:
-  - mix dialyzer --halt-exit-status
+  - mix dialyzer
   - mix test
