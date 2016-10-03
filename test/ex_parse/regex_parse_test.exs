@@ -10,23 +10,24 @@ defmodule ExParse.RegexParseTest do
       {"", {:ok, :epsilon}},
       {"a", {:ok, ~c[a]}},
       {"ab", {:ok, ~c[ab]}},
+    ],
+    "union" => [
+      {"|a", {:ok, {:union, :epsilon, ~c[a]}}},
+      {"a|", {:ok, {:union, ~c[a], :epsilon}}},
+      {"a|b", {:ok, {:union, ~c[a],  ~c[b]}}},
+      {"ab|c", {:ok, {:union, ~c[ab], ~c[c]}}},
+      {"a|bc", {:ok, {:union, ~c[a], ~c[bc]}}},
     ]
   }
 
   for {description, examples} <- @example_table do
     describe description do
       for {input, expect} <- examples do
-        test "~r/#{input}/", do: assert unquote(expect) = RP.parse(unquote(input))
+        test "~r/#{input}/" do
+          assert unquote(Macro.escape(expect)) = RP.parse(unquote(input))
+        end
       end
     end
-  end
-
-  describe "union" do
-    test "|a",   do: assert {:ok, {:union, :epsilon, ~c[a]}} = RP.parse("|a")
-    test "a|",   do: assert {:ok, {:union, ~c[a], :epsilon}} = RP.parse("a|")
-    test "a|b",  do: assert {:ok, {:union, ~c[a],  ~c[b]}}   = RP.parse("a|b")
-    test "ab|c", do: assert {:ok, {:union, ~c[ab], ~c[c]}}   = RP.parse("ab|c")
-    test "a|bc", do: assert {:ok, {:union, ~c[a], ~c[bc]}}   = RP.parse("a|bc")
   end
 
   describe "repeat zero or more" do
