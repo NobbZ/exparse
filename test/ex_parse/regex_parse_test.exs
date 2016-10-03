@@ -17,7 +17,14 @@ defmodule ExParse.RegexParseTest do
       {"a|b", {:ok, {:union, ~c[a],  ~c[b]}}},
       {"ab|c", {:ok, {:union, ~c[ab], ~c[c]}}},
       {"a|bc", {:ok, {:union, ~c[a], ~c[bc]}}},
-    ]
+    ],
+    "repeat zero or more" => [
+      {"a*", {:ok, {:zero_more, ~c[a]}}},
+      {"a*b", {:ok, [{:zero_more, ~c[a]}, ?b]}},
+      {"a*bc", {:ok, [{:zero_more, ~c[a]}, ?b, ?c]}},
+      {"ab*c", {:ok, [?a, {:zero_more, ~c[b]}, ?c]}},
+      {"abc*", {:ok, [?a, ?b, {:zero_more, ~c[c]}]}},
+    ],
   }
 
   for {description, examples} <- @example_table do
@@ -28,14 +35,6 @@ defmodule ExParse.RegexParseTest do
         end
       end
     end
-  end
-
-  describe "repeat zero or more" do
-    test "a*",   do: assert {:ok, {:zero_more, ~c[a]}}           = RP.parse("a*")
-    test "a*b",  do: assert {:ok, [{:zero_more, ~c[a]}, ?b]}     = RP.parse("a*b")
-    test "a*bc", do: assert {:ok, [{:zero_more, ~c[a]}, ?b, ?c]} = RP.parse("a*bc")
-    test "ab*c", do: assert {:ok, [?a, {:zero_more, ~c[b]}, ?c]} = RP.parse("ab*c")
-    test "abc*", do: assert {:ok, [?a, ?b, {:zero_more, ~c[c]}]} = RP.parse("abc*")
   end
 
   describe "repeat one ore more" do
