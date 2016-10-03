@@ -29,7 +29,8 @@ defmodule ExParse.NfaTest do
       assert {:ok, %Nfa{states: %{
         0 => %{:epsilon => [2]},
         2 => %{"a"      => [4]},
-        4 => %{"b"      => [1]},
+        4 => %{"b"      => [3]},
+        3 => %{:epsilon => [1]},
         1 => %{}
       }}} === "ab" |> RP.parse! |> Nfa.from_regex
     end
@@ -55,9 +56,38 @@ defmodule ExParse.NfaTest do
         1 => %{}
       }}} === "a|" |> RP.parse! |> Nfa.from_regex
     end
-#    test "a|b",  do: assert {:ok, {:union, ~c[a],  ~c[b]}}   = RP.parse("a|b")
-#    test "ab|c", do: assert {:ok, {:union, ~c[ab], ~c[c]}}   = RP.parse("ab|c")
-#    test "a|bc", do: assert {:ok, {:union, ~c[a], ~c[bc]}}   = RP.parse("a|bc")
+
+    test "a|b" do
+      assert {:ok, %Nfa{states: %{
+        0 => %{:epsilon => [2]},
+        2 => %{"a"      => [3],
+               "b"      => [3]},
+        3 => %{:epsilon => [1]},
+        1 => %{}
+      }}} === "a|b" |> RP.parse! |> Nfa.from_regex
+    end
+
+    test "ab|c" do
+      assert {:ok, %Nfa{states: %{
+        0 => %{:epsilon => [2]},
+        2 => %{"a"      => [4],
+               "c"      => [3]},
+        4 => %{"b"      => [3]},
+        3 => %{:epsilon => [1]},
+        1 => %{}
+      }}} = "ab|c" |> RP.parse! |> Nfa.from_regex
+    end
+
+    test "a|bc" do
+      assert {:ok, %Nfa{states: %{
+        0 => %{:epsilon => [2]},
+        2 => %{"a"      => [3],
+               "b"      => [4]},
+        4 => %{"c"      => [3]},
+        3 => %{:epsilon => [1]},
+        1 => %{}
+      }}} = "a|bc" |> RP.parse! |> Nfa.from_regex
+    end
   end
 
 #  describe "repeat zero or more" do
