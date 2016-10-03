@@ -6,6 +6,7 @@ otp_release:
 after_script:
   - mix deps.get --only docs
   - MIX_ENV=docs mix inch.report
+  - mix credo --strict
 # before_script:
 #   - mix dialyzer.plt
 # script:
