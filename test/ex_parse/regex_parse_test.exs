@@ -32,6 +32,13 @@ defmodule ExParse.RegexParseTest do
       {"ab+c", {:ok, [?a, {:one_more, ~c[b]}, ?c]}},
       {"abc+", {:ok, [?a, ?b, {:one_more, ~c[c]}]}},
     ],
+    "option" => [
+      {"a?", {:ok, {:zero_one, ~c[a]}}},
+      {"a?b", {:ok, [{:zero_one, ~c[a]}, ?b]}},
+      {"a?bc", {:ok, [{:zero_one, ~c[a]}, ?b, ?c]}},
+      {"ab?c", {:ok, [?a, {:zero_one, ~c[b]}, ?c]}},
+      {"abc?", {:ok, [?a, ?b, {:zero_one, ~c[c]}]}},
+    ]
   }
 
   for {description, examples} <- @example_table do
@@ -42,14 +49,6 @@ defmodule ExParse.RegexParseTest do
         end
       end
     end
-  end
-
-  describe "option" do
-    test "a?",   do: assert {:ok, {:zero_one, ~c[a]}}           = RP.parse("a?")
-    test "a?b",  do: assert {:ok, [{:zero_one, ~c[a]}, ?b]}     = RP.parse("a?b")
-    test "a?bc", do: assert {:ok, [{:zero_one, ~c[a]}, ?b, ?c]} = RP.parse("a?bc")
-    test "ab?c", do: assert {:ok, [?a, {:zero_one, ~c[b]}, ?c]} = RP.parse("ab?c")
-    test "abc?", do: assert {:ok, [?a, ?b, {:zero_one, ~c[c]}]} = RP.parse("abc?")
   end
 
   describe "groups" do
