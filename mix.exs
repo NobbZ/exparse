@@ -4,7 +4,7 @@ defmodule ExParse.Mixfile do
   def project do
     [app: :exparse,
      version: "0.0.1",
-     elixir: (if Mix.env == :test, do: "~> 1.3", else: "~> 1.2"),
+     elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps]
