@@ -12,3 +12,7 @@ before_script:
 script:
   - mix dialyzer
   - mix test
+cache:
+  directory:
+    - deps
+    - build
