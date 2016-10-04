@@ -61,6 +61,19 @@ defmodule ExParse.RegexParseTest do
       {"[^abc]", {:ok, {:neg_set, ~c[abc]}}},
       {"[^a-c]", {:ok, {:neg_set, ~c[abc]}}},
     ],
+    "specials" => [
+      {".",{:ok, :any}},
+      {"a.", {:ok, [?a, :any]}},
+      {".a", {:ok, [:any, ?a]}},
+      {"^", {:ok, :bos}},
+      {"$", {:ok, :eos}},
+      {"\\d", {:ok, :digit}},
+      {"\\D", {:ok, :no_digit}},
+      {"\\s", {:ok, :whitespace}},
+      {"\\S", {:ok, :no_whitespace}},
+      {"\\w", {:ok, :word_character}},
+      {"\\W", {:ok, :no_word_character}},
+    ],
   }
 
   for {description, examples} <- @example_table do
@@ -71,24 +84,6 @@ defmodule ExParse.RegexParseTest do
         end
       end
     end
-  end
-
-  describe "specials" do
-    test ".",  do: assert {:ok, :any}       = RP.parse(".")
-    test "a.", do: assert {:ok, [?a, :any]} = RP.parse("a.")
-    test ".a", do: assert {:ok, [:any, ?a]} = RP.parse(".a")
-
-    test "^", do: assert {:ok, :bos} = RP.parse("^")
-    test "$", do: assert {:ok, :eos} = RP.parse("$")
-
-    test "\\d", do: assert {:ok, :digit}    = RP.parse("\\d")
-    test "\\D", do: assert {:ok, :no_digit} = RP.parse("\\D")
-
-    test "\\s", do: assert {:ok, :whitespace}    = RP.parse("\\s")
-    test "\\S", do: assert {:ok, :no_whitespace} = RP.parse("\\S")
-
-    test "\\w", do: assert {:ok, :word_character}    = RP.parse("\\w")
-    test "\\W", do: assert {:ok, :no_word_character} = RP.parse("\\W")
   end
 
   describe "combinations" do
