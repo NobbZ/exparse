@@ -8,11 +8,11 @@ after_script:
   - mix inch.report
   - mix credo --strict
 before_script:
+  - mkdir -p .plt
   - mix dialyzer.plt
 script:
   - mix dialyzer
   - MIX_ENV=test mix coveralls.travis
 cache:
   directories:
-    - deps
-    - build
+    - .plt

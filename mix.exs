@@ -16,7 +16,7 @@ defmodule ExParse.Mixfile do
         "coveralls.html": :test,
       ],
       dialyzer: [
-        plt_file: "deps/plt_#{System.version}_#{:erlang.system_info(:otp_release)}.plt"
+        plt_file: ".plt/plt_#{System.version}_#{:erlang.system_info(:otp_release)}.plt"
       ]
     ]
   end
