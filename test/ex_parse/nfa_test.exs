@@ -90,14 +90,37 @@ defmodule ExParse.NfaTest do
     end
   end
 
-#  describe "repeat zero or more" do
-#    test "a*",   do: assert {:ok,  {:zero_more, ~c[a]}         } = RP.parse("a*")
-#    test "a*b",  do: assert {:ok, [{:zero_more, ~c[a]}, ?b]    } = RP.parse("a*b")
+  describe "repeat zero or more" do
+    test "a*" do
+      assert {:ok, %Nfa{states: %{
+        0 => %{:epsilon => [2]},
+        2 => %{:epsilon => [4]},
+        4 => %{"a"      => [5],
+               :epsilon => [3]},
+        5 => %{:epsilon => [3,4]},
+        3 => %{:epsilon => [1]},
+        1 => %{},
+      }}} === "a*" |> RP.parse! |> Nfa.from_regex
+    end
+
+    test "a*b" do
+      assert {:ok, %Nfa{states: %{
+        0 => %{:epsilon => [2]},
+        2 => %{:epsilon => [5]},
+        5 => %{"a"      => [6],
+               :epsilon => [4]},
+        6 => %{:epsilon => [4,5]},
+        4 => %{"b"      => [3]},
+        3 => %{:epsilon => [1]},
+        1 => %{},
+      }}} === "a*b" |> RP.parse! |> Nfa.from_regex
+    end
+
 #    test "a*bc", do: assert {:ok, [{:zero_more, ~c[a]}, ?b, ?c]} = RP.parse("a*bc")
 #    test "ab*c", do: assert {:ok, [?a, {:zero_more, ~c[b]}, ?c]} = RP.parse("ab*c")
 #    test "abc*", do: assert {:ok, [?a, ?b, {:zero_more, ~c[c]}]} = RP.parse("abc*")
-#  end
-#
+  end
+
 #  describe "repeat one ore more" do
 #    test "a+",   do: assert {:ok,  {:one_more, ~c[a]}         } = RP.parse("a+")
 #    test "a+b",  do: assert {:ok, [{:one_more, ~c[a]}, ?b]    } = RP.parse("a+b")

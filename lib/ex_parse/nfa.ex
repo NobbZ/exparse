@@ -22,6 +22,14 @@ defmodule ExParse.Nfa do
   defp from_regex(c, nfa, from, to, next) when is_integer(c), do: connect(nfa, from, to, <<c::utf8>>, next)
   defp from_regex(l, nfa, from, to, next) when is_list(l), do: do_seq(l, nfa, from, to, next)
   defp from_regex(:epsilon, nfa, from, to, next), do: connect(nfa, from, to, :epsilon, next)
+  defp from_regex({:zero_more, re}, nfa, from, to, next) do
+    {a, b} = {next, next + 1}
+    {next, nfa} = connect(nfa, from, a, :epsilon, next)
+    {next, nfa} = from_regex(re, nfa, a, b, next)
+    {next, nfa} = connect(nfa, b, to, :epsilon, next)
+    {next, nfa} = connect(nfa, b, a, :epsilon, next)
+    connect(nfa, a, to, :epsilon, next)
+  end
   defp from_regex({:union, l, r}, nfa, from, to, next) do
     {next, nfa} = from_regex(l, nfa, from, to, next)
     from_regex(r, nfa, from, to, next)
