@@ -15,13 +15,11 @@ defmodule ExParse.Nfa do
   def from_regex(re) do
     case from_regex(re, new, 2, 3, 4) do
       {x, nfa} when is_integer(x) -> {:ok, nfa}
-      res -> res
     end
   end
 
   defp from_regex(re, %__MODULE__{} = nfa, from, to, next) do
     case re do
-      [] -> from_regex(:epsilon, nfa, from, to, next)
       :epsilon ->
         connect(nfa, from, to, :epsilon, next)
       char when is_integer(char) ->
