@@ -1,6 +1,5 @@
 defmodule ExParse.RegexParseTest do
   use ExUnit.Case, async: true
-  # use ExCheck
   doctest ExParse.RegexParse
 
   alias ExParse.RegexParse, as: RP
@@ -74,6 +73,9 @@ defmodule ExParse.RegexParseTest do
       {"\\w", {:ok, :word_character}},
       {"\\W", {:ok, :no_word_character}},
     ],
+    "combinations" => [
+      {"a?b*", {:ok, [{:zero_one, ~c[a]}, {:zero_more, ~c[b]}]}}
+    ],
   }
 
   for {description, examples} <- @example_table do
@@ -84,10 +86,6 @@ defmodule ExParse.RegexParseTest do
         end
       end
     end
-  end
-
-  describe "combinations" do
-    test "a?b*", do: assert {:ok, [{:zero_one, ~c[a]}, {:zero_more, ~c[b]}]} = RP.parse("a?b*")
   end
 
   describe "simplify" do
