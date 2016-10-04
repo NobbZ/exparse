@@ -18,18 +18,13 @@ defmodule ExParse.Nfa do
     end
   end
 
-  defp from_regex(re, %__MODULE__{} = nfa, from, to, next) do
-    case re do
-      :epsilon ->
-        connect(nfa, from, to, :epsilon, next)
-      char when is_integer(char) ->
-        connect(nfa, from, to, <<char::utf8>>, next)
-      seq when is_list(seq) ->
-        do_seq(seq, nfa, from, to, next)
-      {:union, left, right} ->
-        {next, nfa} = from_regex(left, nfa, from, to, next)
-        from_regex(right, nfa, from, to, next)
-    end
+  defp from_regex(re, nfa, from, to, next)
+  defp from_regex(c, nfa, from, to, next) when is_integer(c), do: connect(nfa, from, to, <<c::utf8>>, next)
+  defp from_regex(l, nfa, from, to, next) when is_list(l), do: do_seq(l, nfa, from, to, next)
+  defp from_regex(:epsilon, nfa, from, to, next), do: connect(nfa, from, to, :epsilon, next)
+  defp from_regex({:union, l, r}, nfa, from, to, next) do
+    {next, nfa} = from_regex(l, nfa, from, to, next)
+    from_regex(r, nfa, from, to, next)
   end
 
   defp do_seq(seq, nfa, from, to, next)
