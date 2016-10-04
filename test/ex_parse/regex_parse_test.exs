@@ -45,6 +45,14 @@ defmodule ExParse.RegexParseTest do
       {"(a)b", {:ok, [{:group, ~c[a]}, ?b]}},
       {"a(b)", {:ok, [?a, {:group, ~c[b]}]}},
     ],
+    "charsets" => [
+      {"[a]", {:ok, {:set, ~c[a]}}},
+      {"[ab]", {:ok, {:set, ~c[ab]}}},
+      {"[a]b", {:ok, [{:set, ~c[a]}, ?b]}},
+      {"a[b]", {:ok, [?a, {:set, ~c[b]}]}},
+      {"[abc]", {:ok, {:set, ~c[abc]}}},
+      {"[a-c]", {:ok, {:set, ~c[abc]}}},
+    ],
   }
 
   for {description, examples} <- @example_table do
@@ -55,15 +63,6 @@ defmodule ExParse.RegexParseTest do
         end
       end
     end
-  end
-
-  describe "charsets" do
-    test "[a]",   do: assert {:ok, {:set, ~c[a]}}       = RP.parse("[a]")
-    test "[ab]",  do: assert {:ok, {:set, ~c[ab]}}      = RP.parse("[ab]")
-    test "[a]b",  do: assert {:ok, [{:set, ~c[a]}, ?b]} = RP.parse("[a]b")
-    test "a[b]",  do: assert {:ok, [?a, {:set, ~c[b]}]} = RP.parse("a[b]")
-    test "[abc]", do: assert {:ok, {:set, ~c[abc]}}     = RP.parse("[abc]")
-    test "[a-c]", do: assert {:ok, {:set, ~c[abc]}}     = RP.parse("[a-c]")
   end
 
   describe "negated charsets" do
