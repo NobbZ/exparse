@@ -88,6 +88,9 @@ defmodule ExParse.RegexParseTest do
     "combinations" => [
       {"a?b*", {:ok, [{:zero_one, ~c[a]}, {:zero_more, ~c[b]}]}}
     ],
+    "complex cases" => [
+      {@ipaddress_re, {:ok, @ipaddress_ast}},
+    ],
   }
 
   for {description, examples} <- @example_table do
@@ -115,39 +118,5 @@ defmodule ExParse.RegexParseTest do
       {:ok, re_ast} = RP.parse "[abc]+"
       assert [{:set, ~c[abc]}, {:zero_more, {:set, ~c[abc]}}] = RP.simplify(re_ast)
     end
-  end
-
-  test "complex case" do
-    assert \
-      {:ok, [{:group,
-              {:union,
-               {:union, [?2, ?5, {:set, '012345'}],
-                [?2, {:set, '01234'}, {:set, '0123456789'}]},
-               [zero_one: {:set, '01'}, set: '0123456789',
-                zero_one: {:set, '0123456789'}]}}, :any,
-             {:group,
-              {:union,
-               {:union, [?2, ?5, {:set, '012345'}],
-                [?2, {:set, '01234'}, {:set, '0123456789'}]},
-               [zero_one: {:set, '01'}, set: '0123456789',
-                zero_one: {:set, '0123456789'}]}}, :any,
-             {:group,
-              {:union,
-               {:union, [?2, ?5, {:set, '012345'}],
-                [?2, {:set, '01234'}, {:set, '0123456789'}]},
-               [zero_one: {:set, '01'}, set: '0123456789',
-                zero_one: {:set, '0123456789'}]}}, :any,
-             {:group,
-              {:union,
-               {:union, [?2, ?5, {:set, '012345'}],
-                [?2, {:set, '01234'}, {:set, '0123456789'}]},
-               [zero_one: {:set, '01'}, set: '0123456789',
-                zero_one: {:set, '0123456789'}]}}]} \
-      = RP.parse(
-        "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\." <>
-        "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\." <>
-        "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\." <>
-        "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"
-      )
   end
 end
