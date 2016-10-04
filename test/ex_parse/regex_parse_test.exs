@@ -53,6 +53,14 @@ defmodule ExParse.RegexParseTest do
       {"[abc]", {:ok, {:set, ~c[abc]}}},
       {"[a-c]", {:ok, {:set, ~c[abc]}}},
     ],
+    "negated charsets" => [
+      {"[^a]", {:ok, {:neg_set, ~c[a]}}},
+      {"[^ab]", {:ok, {:neg_set, ~c[ab]}}},
+      {"[^a]b", {:ok, [{:neg_set, ~c[a]}, ?b]}},
+      {"a[^b]", {:ok, [?a, {:neg_set, ~c[b]}]}},
+      {"[^abc]", {:ok, {:neg_set, ~c[abc]}}},
+      {"[^a-c]", {:ok, {:neg_set, ~c[abc]}}},
+    ],
   }
 
   for {description, examples} <- @example_table do
@@ -63,13 +71,6 @@ defmodule ExParse.RegexParseTest do
         end
       end
     end
-  end
-
-  describe "negated charsets" do
-    test "[^a]",  do: assert {:ok, {:neg_set, ~c[a]}}       = RP.parse("[^a]")
-    test "[^ab]", do: assert {:ok, {:neg_set, ~c[ab]}}      = RP.parse("[^ab]")
-    test "[^a]b", do: assert {:ok, [{:neg_set, ~c[a]}, ?b]} = RP.parse("[^a]b")
-    test "a[^b]", do: assert {:ok, [?a, {:neg_set, ~c[b]}]} = RP.parse("a[^b]")
   end
 
   describe "specials" do
