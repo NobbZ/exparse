@@ -4,6 +4,18 @@ defmodule ExParse.RegexParseTest do
 
   alias ExParse.RegexParse, as: RP
 
+  @ippart_re "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"
+  @ipaddress_re Enum.join([@ippart_re, @ippart_re, @ippart_re, @ippart_re], "\\.")
+
+  @ippart_ast {:group,
+    {:union,
+      {:union,
+        [?2, ?5, {:set, '012345'}],
+        [?2, {:set, '01234'}, {:set, '0123456789'}]
+      },
+      [zero_one: {:set, '01'}, set: '0123456789', zero_one: {:set, '0123456789'}]}}
+  @ipaddress_ast [@ippart_ast, ?., @ippart_ast, ?., @ippart_ast, ?., @ippart_ast]
+
   @example_table %{
     "concat" => [
       {"", {:ok, :epsilon}},
