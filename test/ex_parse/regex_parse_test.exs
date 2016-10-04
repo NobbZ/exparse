@@ -38,7 +38,13 @@ defmodule ExParse.RegexParseTest do
       {"a?bc", {:ok, [{:zero_one, ~c[a]}, ?b, ?c]}},
       {"ab?c", {:ok, [?a, {:zero_one, ~c[b]}, ?c]}},
       {"abc?", {:ok, [?a, ?b, {:zero_one, ~c[c]}]}},
-    ]
+    ],
+    "groups" => [
+      {"(a)", {:ok, {:group, ~c[a]}}},
+      {"(ab)", {:ok, {:group, ~c[ab]}}},
+      {"(a)b", {:ok, [{:group, ~c[a]}, ?b]}},
+      {"a(b)", {:ok, [?a, {:group, ~c[b]}]}},
+    ],
   }
 
   for {description, examples} <- @example_table do
@@ -49,13 +55,6 @@ defmodule ExParse.RegexParseTest do
         end
       end
     end
-  end
-
-  describe "groups" do
-    test "(a)",  do: assert {:ok, {:group, ~c[a]}}       = RP.parse("(a)")
-    test "(ab)", do: assert {:ok, {:group, ~c[ab]}}      = RP.parse("(ab)")
-    test "(a)b", do: assert {:ok, [{:group, ~c[a]}, ?b]} = RP.parse("(a)b")
-    test "a(b)", do: assert {:ok, [?a, {:group, ~c[b]}]} = RP.parse("a(b)")
   end
 
   describe "charsets" do
