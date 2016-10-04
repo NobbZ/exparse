@@ -1,0 +1,6 @@
+{
+  "skip_files": [
+    "src/regex_parse.erl",
+    "src/regex_scan.erl",
+  ]
+}
