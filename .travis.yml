@@ -13,6 +13,6 @@ script:
   - mix dialyzer
   - mix test
 cache:
-  directory:
+  directories:
     - deps
     - build
