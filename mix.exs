@@ -2,15 +2,23 @@ defmodule ExParse.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :exparse,
-     version: "0.0.1",
-     elixir: "~> 1.3",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps,
-     dialyzer: [
-      plt_file: "deps/plt_#{System.version}_#{:erlang.system_info(:otp_release)}.plt"
-     ]]
+    [ app: :exparse,
+      version: "0.0.1",
+      elixir: "~> 1.3",
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      deps: deps,
+      test_coverage: [tool: ExCoveralls],
+      prefered_cli_env: [
+        "coveralls": :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test,
+      ],
+      dialyzer: [
+        plt_file: "deps/plt_#{System.version}_#{:erlang.system_info(:otp_release)}.plt"
+      ]
+    ]
   end
 
   # Configuration for the OTP application
@@ -38,6 +46,8 @@ defmodule ExParse.Mixfile do
      # {:triq, github: "krestenkrab/triq", only: :test},
 
      {:inch_ex,  "~> 0.5", only: :dev},
-     {:credo,    "~> 0.4", only: :dev}]
+     {:credo,    "~> 0.4", only: :dev},
+
+     {:excoveralls, "~> 0.5", only: :test}]
   end
 end

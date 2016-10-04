@@ -11,7 +11,7 @@ before_script:
   - mix dialyzer.plt
 script:
   - mix dialyzer
-  - mix test
+  - mix coveralls.travis
 cache:
   directories:
     - deps
