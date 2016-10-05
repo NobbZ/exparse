@@ -43,8 +43,8 @@ defmodule ExParse.Mixfile do
      {:ex_doc,   "~> 0.14",  only: :dev},
      {:dialyxir, "~> 0.3",   only: :dev},
 
-     # {:excheck,  "~> 0.3",   only: :test},
-     # {:triq, github: "krestenkrab/triq", only: :test},
+     {:excheck,  "~> 0.5",   only: :test},
+     {:triq, github: "triqng/triq", only: :test},
 
      {:inch_ex,  "~> 0.5", only: :dev},
      {:credo,    "~> 0.4", only: :dev},
