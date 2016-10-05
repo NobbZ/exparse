@@ -81,7 +81,7 @@ Erlang code.
 -dialyzer({nowarn_function, parse_and_scan/1}).
 -dialyzer({nowarn_function, format_error/1}).
 
--spec(parse_string(list()) -> 'Elixir.ExParse.RegexParse':ast()).
+-spec(parse_string(maybe_improper_list()) -> {ok, 'Elixir.ExParse.RegexParse':ast()} | {error, any()}).
 parse_string(Str) when is_list(Str) ->
     {ok, Tokens, _} = regex_scan:string(Str),
     parse(Tokens).

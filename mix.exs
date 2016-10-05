@@ -17,7 +17,7 @@ defmodule ExParse.Mixfile do
       ],
       dialyzer: [
         plt_file: ".plt/plt_#{System.version}_#{:erlang.system_info(:otp_release)}.plt",
-        flags: ["-Woverspecs", "-Wrace_conditions", "-Wno_opaque"],
+        flags: ["-Wunderspecs", "-Wrace_conditions", "-Wunmatched_returns", "-Werror_handling", "-Wrace_conditions"],
       ]
     ]
   end
