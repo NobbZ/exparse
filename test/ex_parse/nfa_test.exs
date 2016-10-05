@@ -34,6 +34,17 @@ defmodule ExParse.NfaTest do
         1 => %{}
       }}} === "ab" |> RP.parse! |> Nfa.from_regex
     end
+
+    test "abc" do
+      assert {:ok, %Nfa{states: %{
+        0 => %{:epsilon => [2]},
+        2 => %{"a"      => [4]},
+        4 => %{"b"      => [5]},
+        5 => %{"c"      => [3]},
+        3 => %{:epsilon => [1]},
+        1 => %{}
+      }}} === "abc" |> RP.parse! |> Nfa.from_regex
+    end
   end
 
   describe "union" do
