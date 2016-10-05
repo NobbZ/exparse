@@ -4,12 +4,18 @@ Terminals '|' '*' '+' '(' ')' '.' '$' '\\' '[' '[^' ']' '-' '?' '^' char.
 
 Rootsymbol regex.
 
-regex -> '$empty' : epsilon.
+Unary 500 '\\'.
+Unary 400 '(' ')' '[' ']'.
+Unary 300 '*' '+' '?'.
+Unary 200 '^' '$'.
+Left 100 '|'.
+
 regex -> union : '$1'.
 regex -> simple_re : flatten('$1').
 
 union -> regex '|' simple_re : {union, flatten('$1'), flatten('$3')}.
 
+simple_re -> '$empty' : epsilon.
 simple_re -> concat : '$1'.
 simple_re -> basic_re : '$1'.
 
