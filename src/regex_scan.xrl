@@ -19,3 +19,5 @@ Rules.
 .|\n : {token, {char, TokenLine, TokenChars}}.
 
 Erlang code.
+
+-dialyzer({nowarn_function, yyrev/2}).
