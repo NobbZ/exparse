@@ -129,7 +129,6 @@ defmodule ExParse.NfaTest do
       }}} === "a*b" |> RP.parse! |> Nfa.from_regex
     end
 
-    @tag :focus
     test "a*bc" do
       assert {:ok, %Nfa{states: %{
         0 => %{:epsilon => [2]},
@@ -145,8 +144,21 @@ defmodule ExParse.NfaTest do
       }}} === "a*bc" |> RP.parse! |> Nfa.from_regex
     end
 
-#    test "a*bc", do: assert {:ok, [{:zero_more, ~c[a]}, ?b, ?c]} = RP.parse("a*bc")
-#    test "ab*c", do: assert {:ok, [?a, {:zero_more, ~c[b]}, ?c]} = RP.parse("ab*c")
+    test "ab*c" do
+      assert {:ok, %Nfa{states: %{
+        0 => %{:epsilon => [2]},
+        2 => %{"a"      => [4]},
+        4 => %{:epsilon => [6]},
+        6 => %{:epsilon => [7]},
+        7 => %{"b"      => [8]},
+        8 => %{:epsilon => [7,9]},
+        9 => %{:epsilon => [5]},
+        5 => %{"c"      => [3]},
+        3 => %{:epsilon => [1]},
+        1 => %{},
+      }}} === "ab*c" |> RP.parse! |> Nfa.from_regex
+    end
+
 #    test "abc*", do: assert {:ok, [?a, ?b, {:zero_more, ~c[c]}]} = RP.parse("abc*")
   end
 
