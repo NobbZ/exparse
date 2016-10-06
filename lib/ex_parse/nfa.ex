@@ -5,6 +5,8 @@ defmodule ExParse.Nfa do
 
   import EEx
 
+  alias ExParse.Streamer
+
   @all_chars 0..0xd7ff |> Enum.into(MapSet.new)
 
   def new(), do: %__MODULE__{states: %{
@@ -15,8 +17,9 @@ defmodule ExParse.Nfa do
   }}
 
   def from_regex(re) do
-    case from_regex(re, new, 2, 3, 4) do
-      {x, nfa} when is_integer(x) -> {:ok, nfa}
+    id_stream = Streamer.new(4)
+    case from_regex(re, new, 2, 3, id_stream) do
+      {_, nfa} -> {:ok, nfa}
     end
   end
 
@@ -34,12 +37,13 @@ defmodule ExParse.Nfa do
   defp from_regex(l, nfa, from, to, next) when is_list(l), do: do_seq(l, nfa, from, to, next)
   defp from_regex(:epsilon, nfa, from, to, next), do: connect(nfa, from, to, :epsilon, next)
   defp from_regex({:zero_more, re}, nfa, from, to, next) do
-    {a, b} = {next, next + 1}
+    {[a, b, c, d], next} = Streamer.take(next, 4)
+    {next, nfa} = connect(nfa, a, b, :epsilon, next)
+    {next, nfa} = from_regex(re, nfa, b, c, next)
+    {next, nfa} = connect(nfa, c, d, :epsilon, next)
+    {next, nfa} = connect(nfa, c, b, :epsilon, next)
     {next, nfa} = connect(nfa, from, a, :epsilon, next)
-    {next, nfa} = from_regex(re, nfa, a, b, next)
-    {next, nfa} = connect(nfa, b, to, :epsilon, next)
-    {next, nfa} = connect(nfa, b, a, :epsilon, next)
-    connect(nfa, a, to, :epsilon, next)
+    connect(nfa, d, to, :epsilon, next)
   end
   defp from_regex({:union, l, r}, nfa, from, to, next) do
     {next, nfa} = from_regex(l, nfa, from, to, next)
@@ -50,9 +54,9 @@ defmodule ExParse.Nfa do
   defp do_seq([], nfa, _from, _to, next), do: {next, nfa}
   defp do_seq([item], nfa, from, to, next), do: from_regex(item, nfa, from, to, next)
   defp do_seq([head|tail], nfa, from, to, next) do
-    new_from = next
-    {next, nfa} = from_regex(head, nfa, from, next, next + 1)
-    do_seq(tail, nfa, new_from, to, next)
+    {[a], next} = Streamer.take(next, 1)
+    {next, nfa} = from_regex(head, nfa, from, a, next)
+    do_seq(tail, nfa, a, to, next)
   end
 
   defp connect(nfa, from, to, label, next)
