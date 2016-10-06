@@ -1,0 +1,10 @@
+digraph <%= @name %> {
+  <%= for {node, deltas} <- @graph do %>
+    q<%= node %> [label="q_<%= node %>"]
+    <%= for {delta, other_nodes} <- deltas do %>
+      <%= for other_node <- other_nodes do %>
+        q<%= node %> -> q<%= other_node %> [label="<%= delta %>"]
+      <% end %>
+    <% end %>
+  <% end %>
+}

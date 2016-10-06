@@ -3,6 +3,8 @@ defmodule ExParse.Nfa do
 
   defstruct states: Map.new
 
+  import EEx
+
   @all_chars 0..0xd7ff |> Enum.into(MapSet.new)
 
   def new(), do: %__MODULE__{states: %{
@@ -16,6 +18,15 @@ defmodule ExParse.Nfa do
     case from_regex(re, new, 2, 3, 4) do
       {x, nfa} when is_integer(x) -> {:ok, nfa}
     end
+  end
+
+  def from_regex!(re) do
+    {:ok, nfa} = from_regex(re)
+    nfa
+  end
+
+  def to_graphviz(nfa, filename) do
+    File.write(filename, nfa_dot(name: "foo", graph: nfa.states))
   end
 
   defp from_regex(re, nfa, from, to, next)
@@ -58,4 +69,6 @@ defmodule ExParse.Nfa do
       {next, %{nfa | states: Map.merge(nfa.states, new_state_transitions)}}
     end
   end
+
+  function_from_file(:defp, :nfa_dot, "lib/nfa.dot.eex", [:assigns])
 end
