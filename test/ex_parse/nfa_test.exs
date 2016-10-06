@@ -86,7 +86,7 @@ defmodule ExParse.NfaTest do
         4 => %{"b"      => [3]},
         3 => %{:epsilon => [1]},
         1 => %{}
-      }}} = "ab|c" |> RP.parse! |> Nfa.from_regex
+      }}} === "ab|c" |> RP.parse! |> Nfa.from_regex
     end
 
     test "a|bc" do
@@ -97,7 +97,7 @@ defmodule ExParse.NfaTest do
         4 => %{"c"      => [3]},
         3 => %{:epsilon => [1]},
         1 => %{}
-      }}} = "a|bc" |> RP.parse! |> Nfa.from_regex
+      }}} === "a|bc" |> RP.parse! |> Nfa.from_regex
     end
   end
 
@@ -106,41 +106,43 @@ defmodule ExParse.NfaTest do
       assert {:ok, %Nfa{states: %{
         0 => %{:epsilon => [2]},
         2 => %{:epsilon => [4]},
-        4 => %{"a"      => [5],
-               :epsilon => [3]},
-        5 => %{:epsilon => [3,4]},
+        4 => %{:epsilon => [5]},
+        5 => %{"a"      => [6]},
+        6 => %{:epsilon => [5,7]},
+        7 => %{:epsilon => [3]},
         3 => %{:epsilon => [1]},
         1 => %{},
       }}} === "a*" |> RP.parse! |> Nfa.from_regex
     end
 
     test "a*b" do
-      "a*b" |> RP.parse! |> Nfa.from_regex! |> Nfa.to_graphviz("ab.dot")
       assert {:ok, %Nfa{states: %{
         0 => %{:epsilon => [2]},
         2 => %{:epsilon => [5]},
-        5 => %{"a"      => [6],
-               :epsilon => [4]},
-        6 => %{:epsilon => [4,5]},
+        5 => %{:epsilon => [6]},
+        6 => %{"a"      => [7]},
+        7 => %{:epsilon => [6,8]},
+        8 => %{:epsilon => [4]},
         4 => %{"b"      => [3]},
         3 => %{:epsilon => [1]},
         1 => %{},
       }}} === "a*b" |> RP.parse! |> Nfa.from_regex
     end
 
+    @tag :focus
     test "a*bc" do
-      "a*bc" |> RP.parse! |> Nfa.from_regex! |> Nfa.to_graphviz("abc.dot")
       assert {:ok, %Nfa{states: %{
         0 => %{:epsilon => [2]},
         2 => %{:epsilon => [5]},
-        5 => %{"a"      => [6],
-               :epsilon => [4]},
-        6 => %{:epsilon => [4,5]},
-        4 => %{"b"      => [3]},
+        5 => %{:epsilon => [6]},
+        6 => %{"a"      => [7]},
+        7 => %{:epsilon => [6,8]},
+        8 => %{:epsilon => [4]},
+        4 => %{"b"      => [9]},
+        9 => %{"c"      => [3]},
         3 => %{:epsilon => [1]},
         1 => %{},
       }}} === "a*bc" |> RP.parse! |> Nfa.from_regex
-      assert :d = "a*bc" |> RP.parse! |> Nfa.from_regex! |> Nfa.to_graphviz("") |> IO.inspect
     end
 
 #    test "a*bc", do: assert {:ok, [{:zero_more, ~c[a]}, ?b, ?c]} = RP.parse("a*bc")
