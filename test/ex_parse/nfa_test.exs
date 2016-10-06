@@ -159,7 +159,20 @@ defmodule ExParse.NfaTest do
       }}} === "ab*c" |> RP.parse! |> Nfa.from_regex
     end
 
-#    test "abc*", do: assert {:ok, [?a, ?b, {:zero_more, ~c[c]}]} = RP.parse("abc*")
+    test "abc*" do
+      assert {:ok, %Nfa{states: %{
+        0 => %{:epsilon => [2]},
+        2 => %{"a"      => [4]},
+        4 => %{"b"      => [5]},
+        5 => %{:epsilon => [6]},
+        6 => %{:epsilon => [7]},
+        7 => %{"c"      => [8]},
+        8 => %{:epsilon => [7,9]},
+        9 => %{:epsilon => [3]},
+        3 => %{:epsilon => [1]},
+        1 => %{},
+      }}} === "abc*" |> RP.parse! |> Nfa.from_regex
+    end
   end
 
 #  describe "repeat one ore more" do
