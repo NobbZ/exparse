@@ -115,6 +115,7 @@ defmodule ExParse.NfaTest do
     end
 
     test "a*b" do
+      "a*b" |> RP.parse! |> Nfa.from_regex! |> Nfa.to_graphviz("ab.dot")
       assert {:ok, %Nfa{states: %{
         0 => %{:epsilon => [2]},
         2 => %{:epsilon => [5]},
@@ -125,6 +126,21 @@ defmodule ExParse.NfaTest do
         3 => %{:epsilon => [1]},
         1 => %{},
       }}} === "a*b" |> RP.parse! |> Nfa.from_regex
+    end
+
+    test "a*bc" do
+      "a*bc" |> RP.parse! |> Nfa.from_regex! |> Nfa.to_graphviz("abc.dot")
+      assert {:ok, %Nfa{states: %{
+        0 => %{:epsilon => [2]},
+        2 => %{:epsilon => [5]},
+        5 => %{"a"      => [6],
+               :epsilon => [4]},
+        6 => %{:epsilon => [4,5]},
+        4 => %{"b"      => [3]},
+        3 => %{:epsilon => [1]},
+        1 => %{},
+      }}} === "a*bc" |> RP.parse! |> Nfa.from_regex
+      assert :d = "a*bc" |> RP.parse! |> Nfa.from_regex! |> Nfa.to_graphviz("") |> IO.inspect
     end
 
 #    test "a*bc", do: assert {:ok, [{:zero_more, ~c[a]}, ?b, ?c]} = RP.parse("a*bc")
