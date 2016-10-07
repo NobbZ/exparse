@@ -3,7 +3,7 @@ digraph <%= @name %> {
     q<%= node %> [label="q_<%= node %>"]
     <%= for {delta, other_nodes} <- deltas do %>
       <%= for other_node <- other_nodes do %>
-        q<%= node %> -> q<%= other_node %> [label="<%= delta %>"]
+        q<%= node %> -> q<%= other_node %> [label="<%= if delta == :epsilon, do: "ε", else: delta %>"]
       <% end %>
     <% end %>
   <% end %>
