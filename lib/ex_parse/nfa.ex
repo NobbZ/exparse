@@ -40,6 +40,7 @@ defmodule ExParse.Nfa do
     {[a, b, c, d], next} = Streamer.take(next, 4)
     {next, nfa} = connect(nfa, a, b, :epsilon, next)
     {next, nfa} = from_regex(re, nfa, b, c, next)
+    {next, nfa} = connect(nfa, b, d, :epsilon, next)
     {next, nfa} = connect(nfa, c, d, :epsilon, next)
     {next, nfa} = connect(nfa, c, b, :epsilon, next)
     {next, nfa} = connect(nfa, from, a, :epsilon, next)
