@@ -35,14 +35,12 @@ defmodule ExParse.Nfa do
   defp from_regex(l, nfa, from, to, next) when is_list(l), do: do_seq(l, nfa, from, to, next)
   defp from_regex(:epsilon, nfa, from, to, next), do: connect(nfa, from, to, :epsilon, next)
   defp from_regex({:zero_more, re}, nfa, from, to, next) do
-    {[a, b, c, d], next} = Streamer.take(next, 4)
-    {next, nfa} = connect(nfa, a, b, :epsilon, next)
-    {next, nfa} = from_regex(re, nfa, b, c, next)
-    {next, nfa} = connect(nfa, b, d, :epsilon, next)
-    {next, nfa} = connect(nfa, c, d, :epsilon, next)
-    {next, nfa} = connect(nfa, c, b, :epsilon, next)
+    {[a, b], next} = Streamer.take(next, 2)
     {next, nfa} = connect(nfa, from, a, :epsilon, next)
-    connect(nfa, d, to, :epsilon, next)
+    {next, nfa} = from_regex(re, nfa, a, b, next)
+    {next, nfa} = connect(nfa, a, to, :epsilon, next)
+    {next, nfa} = connect(nfa, b, to, :epsilon, next)
+    connect(nfa, b, a, :epsilon, next)
   end
   defp from_regex({:union, l, r}, nfa, from, to, next) do
     {next, nfa} = from_regex(l, nfa, from, to, next)
