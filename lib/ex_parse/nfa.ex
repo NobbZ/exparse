@@ -10,15 +10,13 @@ defmodule ExParse.Nfa do
   @all_chars 0..0xd7ff |> Enum.into(MapSet.new)
 
   def new(), do: %__MODULE__{states: %{
-    0 => %{epsilon: [2]},
-    2 => %{},
-    3 => %{epsilon: [1]},
+    0 => %{},
     1 => %{},
   }}
 
   def from_regex(re) do
-    id_stream = Streamer.new(4)
-    case from_regex(re, new, 2, 3, id_stream) do
+    id_stream = Streamer.new(2)
+    case from_regex(re, new, 0, 1, id_stream) do
       {_, nfa} -> {:ok, nfa}
     end
   end
