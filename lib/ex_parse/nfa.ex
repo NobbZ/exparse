@@ -30,6 +30,23 @@ defmodule ExParse.Nfa do
     File.write(filename, nfa_dot(name: "foo", graph: nfa.states))
   end
 
+  def to_table(nfa), do: Enum.reduce(nfa, {nfa, %{}}, &to_table/2)
+
+  defp to_table({q, deltas}, {nfa, acc}) do
+    row = Enum.reduce(deltas, %{}, fn
+      {:epsilon, targets}, acc ->
+        targets = nfa |> follow_epsilon_transitions(q) |> Enum.sort
+     end)
+     IO.puts "row: #{inspect row}"
+     {nfa, acc}
+  end
+
+  defp follow_epsilon_transitions(nfa, q) do
+    case nfa[q] do
+      _ -> nil
+    end
+  end
+
   defp from_regex(re, nfa, from, to, next)
   defp from_regex(c, nfa, from, to, next) when is_integer(c), do: connect(nfa, from, to, <<c::utf8>>, next)
   defp from_regex(l, nfa, from, to, next) when is_list(l), do: do_seq(l, nfa, from, to, next)
@@ -41,6 +58,7 @@ defmodule ExParse.Nfa do
     {next, nfa} = connect(nfa, a, to, :epsilon, next)
     {next, nfa} = connect(nfa, b, to, :epsilon, next)
     connect(nfa, b, a, :epsilon, next)
+    conn
   end
   defp from_regex({:union, l, r}, nfa, from, to, next) do
     {next, nfa} = from_regex(l, nfa, from, to, next)
@@ -72,4 +90,10 @@ defmodule ExParse.Nfa do
   end
 
   function_from_file(:defp, :nfa_dot, "lib/nfa.dot.eex", [:assigns])
+end
+
+defimpl Enumerable, for: ExParse.Nfa do
+  def count(nfa), do: Enumerable.Map.count(nfa.states)
+  def member?(nfa, member), do: Enumerable.Map.member?(nfa.states, member)
+  def reduce(nfa, init, fun), do: Enumerable.Map.reduce(nfa.states, init, fun)
 end

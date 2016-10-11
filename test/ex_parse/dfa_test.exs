@@ -1,9 +1,10 @@
-defmodule ExParse.NfaTest do
+defmodule ExParse.DfaTest do
   use ExUnit.Case, async: true
   # use ExCheck
-  doctest ExParse.Nfa
+  doctest ExParse.Dfa
 
   alias ExParse.Nfa
+  alias ExParse.Dfa
   alias ExParse.RegexParse, as: RP
 
   describe "concat" do
@@ -11,13 +12,7 @@ defmodule ExParse.NfaTest do
       assert {:ok, %Nfa{states: %{
         0 => %{:epsilon => [1]},
         1 => %{}
-      }}} === "" |> RP.parse! |> Nfa.from_regex
-    end
-
-    test "table of //" do
-      assert {:ok, %{
-        0 => %{:epsilon => [1]}
-      }} === "" |> RP.parse! |> Nfa.from_regex! |> Nfa.to_table
+      }}} === "" |> RP.parse! |> Nfa.from_regex! |> Dfa.from_nfa
     end
 
     test "a" do
