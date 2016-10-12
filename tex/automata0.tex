@@ -338,24 +338,107 @@
   \begin{center}
     \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
       \node[state,initial]   (q0)               {$0$};
-      \node[state]           (q2) [below=of q0] {$2$};
-      \node[state]           (q4) [right=of q2] {$4$};
-      \node[state]           (q5) [above=of q4] {$5$};
-      \node[state]           (q6) [right=of q5] {$6$};
-      \node[state]           (q7) [below=of q6] {$7$};
-      \node[state]           (q3) [right=of q7] {$3$};
-      \node[state,accepting] (q1) [above=of q3] {$1$};
+      \node[state]           (q2) [right=of q0] {$2$};
+      \node[state]           (q3) [right=of q2] {$3$};
+      \node[state,accepting] (q1) [right=of q3] {$1$};
       
-      \path[->] (q0)                 edge node {$\epsilon$} (q2)
-                (q2)                 edge node {$\epsilon$} (q4)
-                (q4)                 edge node {$\epsilon$} (q5)
-                (q5) [bend left=35]  edge node {a}          (q6)
-                (q6) [bend left=0]   edge node {$\epsilon$} (q5)
-                (q5) [bend right=10] edge node {$\epsilon$} (q7)
-                (q6) [bend left=0]   edge node {$\epsilon$} (q7)
-                (q7)                 edge node {$\epsilon$} (q3)
-                (q3)                 edge node {$\epsilon$} (q1);
+      \path[->] (q0)                edge node {$\epsilon$} (q2)
+                (q2)                edge node {a}          (q3)
+                (q2) [bend left=45] edge node {$\epsilon$} (q1)
+                (q3)                edge node {$\epsilon$} (q2)
+                (q3) [bend right=0] edge node {$\epsilon$} (q1);
     \end{tikzpicture}
+  \end{center}
+  
+  \begin{center}
+    \begin{tabular}{cc|cc}
+      \toprule
+                    & d &  a  & $\epsilon$* \\
+      \midrule
+      $\rightarrow$ & 0 & --- & 1,2 \\
+                    & 2 &  3  & 1,2 \\
+                    & 3 & --- & 1,2 \\
+      $\leftarrow$  & 1 & --- & --- \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  
+  \begin{center}
+    \begin{tabular}{cc|c}
+      \toprule
+                    & d &  a$\epsilon$* \\
+      \midrule
+      $\rightarrow$, $\leftarrow$ & 0,1,2 & 1,2,3 \\
+      $\leftarrow$                & 1,2,3 & 1,2,3 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  
+  \begin{center}
+    \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
+    \node[state,initial,accepting]   (q012)                 {$0,1,2$};
+    \node[state,accepting]           (q123) [right=of q012] {$1,2,3$};
+    
+    \path[->] (q012)              edge node {a} (q123)
+              (q123) [loop right] edge node {a} (q123);
+    \end{tikzpicture}
+  \end{center}
+  
+  \subsubsection{The regular expression \texttt{/a*b/}}
+  
+  \begin{center}
+    \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
+    \node[state,initial]   (q0)               {$0$};
+    \node[state]           (q3) [right=of q0] {$3$};
+    \node[state]           (q4) [right=of q3] {$4$};
+    \node[state]           (q2) [right=of q4] {$2$};
+    \node[state,accepting] (q1) [right=of q2] {$1$};
+    
+    \path[->] (q0)                edge node {$\epsilon$} (q3)
+              (q3)                edge node {a} (q4)
+              (q3) [bend left=45] edge node {$\epsilon$} (q2)
+              (q4)                edge node {$\epsilon$} (q3)
+              (q4) [bend right=0] edge node {$\epsilon$} (q2)
+              (q2)                edge node {b}          (q1);
+    \end{tikzpicture}
+  \end{center}
+  
+  \begin{center}
+    \begin{tabular}{cc|ccc}
+      \toprule
+      & d &  a  &  b  & $\epsilon$* \\
+      \midrule
+      $\rightarrow$ & 0 & --- & --- & 2,3 \\
+                    & 3 &  4  & --- & 2,3 \\
+                    & 4 & --- & --- & 2,3 \\
+                    & 2 & --- &  1  & --- \\
+      $\leftarrow$  & 1 & --- & --- & --- \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  
+  \begin{center}
+    \begin{tabular}{cc|cc}
+      \toprule
+      & d &  a$\epsilon$* & b$\epsilon$* \\
+      \midrule
+      $\rightarrow$ & 0,2,3 & 2,3,4 &   1   \\
+                    & 2,3,4 & 2,3,4 &   1   \\
+      $\leftarrow$  &   1   &  ---  &  ---  \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  
+  \begin{center}
+    \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
+      \node[state,initial]   (q023)                 {$0,2,3$};
+      \node[state]           (q234) [right=of q023] {$2,3,4$};
+      \node[state,accepting] (q1)   [right=of q234] {$1$};
+      
+      \path[->] (q023)                 edge node         {a} (q234)
+                (q234)                 edge node         {b} (q1)
+                (q023) [bend right=45] edge node [below] {b} (q1);
+,    \end{tikzpicture}
   \end{center}
   
 \end{document}
