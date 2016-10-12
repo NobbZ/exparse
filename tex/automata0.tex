@@ -435,9 +435,10 @@
       \node[state]           (q234) [right=of q023] {$2,3,4$};
       \node[state,accepting] (q1)   [right=of q234] {$1$};
       
-      \path[->] (q023)                 edge node         {a} (q234)
-                (q234)                 edge node         {b} (q1)
-                (q023) [bend right=45] edge node [below] {b} (q1);
+      \path[->] (q023)                edge node         {a} (q234)
+                (q234)                edge node         {b} (q1)
+                (q234) [loop below]   edge node         {a} (q234)
+                (q023) [bend left=45] edge node [above] {b} (q1);
 ,    \end{tikzpicture}
   \end{center}
   
